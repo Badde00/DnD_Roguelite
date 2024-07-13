@@ -7,6 +7,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 public class Table {
   private String tableName;
   private Path jsonFilePath;
@@ -18,11 +21,20 @@ public class Table {
     this.data = new ArrayList<String>();
     try {
       String jsonString = Files.readString(this.jsonFilePath, StandardCharsets.UTF_8);
+      ObjectMapper mapper = new ObjectMapper();
+      this.data = mapper.readValue(jsonString, new TypeReference<ArrayList<String>>() {});
+      System.out.println("Table \"" + tableName + "\" loaded successfully");
     } catch (IOException e) {
-      // Handle the exception here
       e.printStackTrace();
     }
   }
 
+  public String toString() {
+    return this.tableName + " : " + this.data.toString();
+  }
 
+  public String rollOnTable() {
+    int randomIndex = (int) (Math.random() * this.data.size());
+    return this.data.get(randomIndex);
+  }
 }
