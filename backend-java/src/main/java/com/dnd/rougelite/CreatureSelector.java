@@ -7,6 +7,7 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +44,7 @@ public class CreatureSelector {
     Map<String, List<CreatureWrapper>> creaturesByCrAndType = new HashMap<>();
 
     for (CreatureWrapper creature : data) {
-      if (typeList.contains(creature.getType())) {
+      if (creature.getType() != null && typeList.contains(creature.getType())) {
         String key = creature.getCr() + "-" + creature.getType();
         creaturesByCrAndType.computeIfAbsent(key, k -> new ArrayList<>()).add(creature);
       }
@@ -66,13 +67,5 @@ public class CreatureSelector {
     }
 
     return outputList;
-  }
-
-  public static void main(String[] args) {
-    CreatureSelector selector = new CreatureSelector("backend-java\\src\\main\\java\\com\\dnd\\rougelite\\json\\small_bestiary.json");
-    List<String> typeList = List.of("beast", "humanoid");
-    List<String> crList = List.of("0", "0", "1/8", "0");
-    List<CreatureWrapper> creatures = selector.generateCreaturesByCrAndType(typeList, crList);
-    System.out.println(creatures.stream().map(CreatureWrapper::getName).collect(Collectors.toList()));
   }
 }
