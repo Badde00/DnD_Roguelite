@@ -1,0 +1,18 @@
+{
+  "items": [
+    "Currency",
+    "Upgrade Weapon/Health",
+    "Upgrade Armor",
+    "Upgrade Class",
+    "Patronage",
+    "Feat"
+  ],
+  "weights": [
+    0.5,
+    0.1,
+    0.1,
+    0.1,
+    0.1,
+    0.1
+  ]
+}
