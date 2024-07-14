@@ -1,5 +1,5 @@
 # Trademarked stuff
-full_bestiary.json
+backend-java/src/main/java/com/dnd/rougelite/json/full_bestiary.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
