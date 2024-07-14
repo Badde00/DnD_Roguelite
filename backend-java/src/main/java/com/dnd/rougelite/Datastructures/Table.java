@@ -23,7 +23,6 @@ public class Table {
       String jsonString = Files.readString(this.jsonFilePath, StandardCharsets.UTF_8);
       ObjectMapper mapper = new ObjectMapper();
       this.data = mapper.readValue(jsonString, new TypeReference<ArrayList<String>>() {});
-      System.out.println("Table \"" + tableName + "\" loaded successfully");
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -36,5 +35,17 @@ public class Table {
   public String rollOnTable() {
     int randomIndex = (int) (Math.random() * this.data.size());
     return this.data.get(randomIndex);
+  }
+
+  public String getTableName() {
+    return this.tableName;
+  }
+
+  public Path getJsonFilePath() {
+    return this.jsonFilePath;
+  }
+
+  public ArrayList<String> getData() {
+    return this.data;
   }
 }
