@@ -1,16 +1,12 @@
 package com.palmstam.roguelite.controller;
 
-import com.palmstam.roguelite.model.databaseItems.Deal;
-import com.palmstam.roguelite.model.databaseItems.GamblingGame;
-import com.palmstam.roguelite.model.databaseItems.Puzzle;
+import com.palmstam.roguelite.model.databaseItems.*;
 import com.palmstam.roguelite.model.RollDice;
 import com.palmstam.roguelite.model.room.*;
-import com.palmstam.roguelite.repository.DealRepository;
-import com.palmstam.roguelite.repository.EnemyRepository;
-import com.palmstam.roguelite.repository.GamblingGamesRepository;
-import com.palmstam.roguelite.repository.PuzzleRepository;
+import com.palmstam.roguelite.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -29,20 +25,30 @@ public class Generator {
     @Autowired
     private final PuzzleRepository puzzleRepository;
 
+    @Autowired
+    private final ItemRepository itemRepository;
+
+    @Autowired
+    private final SocialNPCRepository socialNPCRepository;
+
     public Generator(
             EnemyRepository enemyRepository,
             DealRepository dealRepository,
             GamblingGamesRepository gamblingGamesRepository,
-            PuzzleRepository puzzleRepository
+            PuzzleRepository puzzleRepository,
+            ItemRepository itemRepository,
+            SocialNPCRepository socialNPCRepository
     ) {
         random = new Random();
         this.enemyRepository = enemyRepository;
         this.dealRepository = dealRepository;
         this.gamblingGamesRepository = gamblingGamesRepository;
         this.puzzleRepository = puzzleRepository;
+        this.itemRepository = itemRepository;
+        this.socialNPCRepository = socialNPCRepository;
     }
 
-    public Room generateRoom(String encounterType, int level) {
+    public Room generateRoom(String encounterType, int level, int playerLevel) {
         switch (encounterType) {
             case "Deal Room":
                 return generateDealRoom(level);
@@ -53,7 +59,9 @@ public class Generator {
             case "Rest Room":
                 return generateRestRoom(level);
             case "Shop Room":
-                return null;
+                return generateShopRoom(level, playerLevel);
+            case "Social Room":
+                return generateSocialRoom(level);
             default:
                 return null;
         }
@@ -128,8 +136,118 @@ public class Generator {
                 .build();
     }
 
-    private ShopRoom generateShopRoom(int level) {
-        return null; //TODO
+    private ShopRoom generateShopRoom(int level, int numberOfPlayers) {
+        // The possible rarities of items, where none are mundane items (or items who erroneously were included while they didn't have rarities
+        List<String> rarities = List.of("artifact", "legendary", "very rare", "rare", "uncommon", "common", "none");
+
+        // Choose the highest available rarity of item and how many mundane weapons/armors should be available
+        // Shop should have 1 deal item of the highest rarity, one full price item of the highest rarity, (numberOfPlayers - 1) number of
+        // items of one lower rarity and the rest should be of two rarities lower.
+        int highestRarityPosition = 0;
+        int numberOfWeaponsAndArmors = 0;
+        if (level <= 3) {
+            highestRarityPosition = 4;
+            numberOfWeaponsAndArmors = 1;
+        } else if (level <= 5) {
+            highestRarityPosition = 3;
+            numberOfWeaponsAndArmors = 2;
+        } else if (level <= 9) {
+            highestRarityPosition = 2;
+            numberOfWeaponsAndArmors = 4;
+        } else if (level <= 13) {
+            highestRarityPosition = 1;
+            numberOfWeaponsAndArmors = 6;
+        }
+        int lowerRarityPosition = highestRarityPosition + 1;
+        int lowestRarityPosition = highestRarityPosition + 2;
+
+        // Deal item
+        Item dealItem = chooseRandom(itemRepository.findByRarity(rarities.get(highestRarityPosition)));
+        // Highest rarity item
+        Item highestRarityItem = chooseRandom(itemRepository.findByRarity(rarities.get(highestRarityPosition)));
+
+        // All items of lower rarities
+        List<Item> lowerRarityItems = itemRepository.findByRarity(rarities.get(lowerRarityPosition));
+        List<Item> lowestRarityItems = itemRepository.findByRarity(rarities.get(lowestRarityPosition));
+
+        // Make wares and add highest rarity item
+        List<Item> wares = new ArrayList<>();
+        wares.add(highestRarityItem);
+
+        // Add lower rarity items
+        for (int i = 0; i < numberOfPlayers - 1; i++) {
+            wares.add(chooseRandom(lowerRarityItems));
+        }
+        for (int i = 0; i < numberOfPlayers; i++) {
+            wares.add(chooseRandom(lowestRarityItems));
+        }
+
+        // Find all mundane weapons and armors
+        List<Item> mundaneWeapons = itemRepository.findByIsMundaneAndType(true, "weapon");
+        List<Item> mundaneArmors = itemRepository.findByIsMundaneAndTypeIn(true, List.of("light armor", "medium armor", "heavy armor"));
+
+        // Add mundane weapons and armors based on numberOfWeaponsAndArmors
+        for (int i = 0; i < numberOfWeaponsAndArmors; i++) {
+            wares.add(chooseRandom(mundaneWeapons));
+            wares.add(chooseRandom(mundaneArmors));
+        }
+
+
+
+        return ShopRoom.builder()
+                .encounterType("Shop Room")
+                .description("A wonderful place where you can buy items in return for gold. It's not recommended to steal or attack the merchant...")
+                .level(level)
+                .shopDescription("A stony cave with a Lizardfolk merchant sitting on a chequered rug with various items spread out before them.")
+                .wares(wares)
+                .itemDeal(dealItem)
+                .build();
+    }
+
+    private SocialRoom generateSocialRoom(int level) {
+        SocialNpc npc = null;
+        if (level <= 5) {
+            npc = socialNPCRepository.getReferenceById(1);
+        } else if (level <= 10) {
+            npc = socialNPCRepository.getReferenceById(2);
+        } else if (level <= 15) {
+            npc = socialNPCRepository.getReferenceById(3);
+        } else if (level <= 20) {
+            npc = socialNPCRepository.getReferenceById(4);
+        }
+
+        if (npc == null) return null;
+
+        return SocialRoom.builder()
+                .encounterType("Social Room")
+                .description("A place to meet unique individuals")
+                .level(level)
+                .personDescription(npc.getPersonDescription())
+                .roomDescription(npc.getRoomDescription())
+                .gift(npc.getGift())
+                .build();
+    }
+
+    private TreasureRoom generateTreasureRoom(int level, int numberOfPlayers) {
+        String[] currencies = new String[5];
+        currencies[0] = (rollCurrencyRewardPerPerson(level, true, true) * numberOfPlayers) + " gold";
+        currencies[1] = (rollCurrencyRewardPerPerson(level, false, false) * numberOfPlayers) + " electrum";
+        currencies[2] = (rollCurrencyRewardPerPerson(level, false, false) * numberOfPlayers) + " gemstones";
+        currencies[3] = (rollCurrencyRewardPerPerson(level, false, false) * numberOfPlayers) + " faith";
+        currencies[4] = (rollCurrencyRewardPerPerson(level, false, false) * numberOfPlayers) + " artwork";
+
+        List<Item> items = new ArrayList<>();
+        for (int i = 0; i < numberOfPlayers + 1; i++) {
+            // TODO: Add items of appropriate rarities, from shop room
+        }
+
+        return TreasureRoom.builder()
+                .encounterType("Treasure Room")
+                .description("Piles of gold, electrum, other valuables and magic items lie in a cave.")
+                .level(level)
+                .currencies(currencies)
+                .items(items)
+                .build();
     }
 
     private <T> T chooseRandom(List<T> itemList) {

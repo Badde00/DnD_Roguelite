@@ -1,6 +1,8 @@
 package com.palmstam.roguelite.controller;
 
+import com.palmstam.roguelite.model.RollDice;
 import com.palmstam.roguelite.model.data.ApiResponse;
+import com.palmstam.roguelite.model.data.GenerateRoomDTO;
 import com.palmstam.roguelite.model.data.ItemDTO;
 import com.palmstam.roguelite.model.databaseItems.Item;
 import com.palmstam.roguelite.model.room.Room;
@@ -34,19 +36,24 @@ public class AdventureController {
     @Autowired
     private final ItemRepository itemRepository;
 
+    @Autowired
+    private final SocialNPCRepository socialNPCRepository;
+
     public AdventureController(
             EnemyRepository enemyRepository,
             DealRepository dealRepository,
             GamblingGamesRepository gamblingGamesRepository,
             PuzzleRepository puzzleRepository,
-            ItemRepository itemRepository
+            ItemRepository itemRepository,
+            SocialNPCRepository socialNPCRepository
     ) {
-        this.generator = new Generator(enemyRepository, dealRepository, gamblingGamesRepository, puzzleRepository);
+        this.generator = new Generator(enemyRepository, dealRepository, gamblingGamesRepository, puzzleRepository, itemRepository, socialNPCRepository);
         this.enemyRepository = enemyRepository;
         this.dealRepository = dealRepository;
         this.gamblingGamesRepository = gamblingGamesRepository;
         this.puzzleRepository = puzzleRepository;
         this.itemRepository = itemRepository;
+        this.socialNPCRepository = socialNPCRepository;
     }
 
     @PostMapping("addItems")
@@ -73,8 +80,18 @@ public class AdventureController {
                     item.setDescription(dto.getEntries().getFirst().toString());
                 }
 
-                item.setPrice(1); // Temporary price. Will later be based on if the item is mundane and rarity.
                 item.setRarity(dto.getRarity());
+                item.setType(Item.cleanType(dto.getType()));
+
+                if (dto.getPrice() != 0) {
+                    item.setPrice(dto.getPrice() / 100);
+                } else if (dto.isMundane()) {
+                    item.setPrice(-1);
+                } else {
+                    int price = Item.getPrice(item);
+                    item.setPrice(price);
+                }
+
                 item.setMundane(dto.isMundane());
                 item.setSource(dto.getSource());
                 item.setPage(dto.getPage());
@@ -106,9 +123,8 @@ public class AdventureController {
 
 
     @GetMapping("room")
-    public ResponseEntity<ApiResponse<?>> generateRoom(@PathVariable String encounterType, @PathVariable Integer level) {
-        int nnLevel = level != null ? level : 1;
-        Room room = generator.generateRoom(encounterType, nnLevel);
+    public ResponseEntity<ApiResponse<?>> generateRoom(@RequestBody GenerateRoomDTO grdto) {
+        Room room = generator.generateRoom(grdto.getEncounterType(), grdto.getLevel(), grdto.getNumberOfPlayers());
 
         ApiResponse<?> response;
         if (room == null) {
@@ -122,8 +138,7 @@ public class AdventureController {
 
     @GetMapping("test")
     public ResponseEntity<ApiResponse<?>> test() {
-        ApiResponse<Room> response = new ApiResponse<>("success", generator.generateRoom("Gambling Room", 6));
+        ApiResponse<Room> response = new ApiResponse<>("success", generator.generateRoom("Shop Room", 2, 4));
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
-
 }

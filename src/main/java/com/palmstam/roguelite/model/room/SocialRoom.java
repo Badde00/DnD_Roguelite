@@ -9,11 +9,13 @@ import lombok.Getter;
 public class SocialRoom extends Room {
     private String roomDescription;
     private String personDescription;
+    private String gift;
 
     @Builder
-    public SocialRoom(String encounterType, String description, int level, String roomDescription, String personDescription) {
+    public SocialRoom(String encounterType, String description, int level, String roomDescription, String personDescription, String gift) {
         super(encounterType, description, level);
         this.roomDescription = roomDescription;
         this.personDescription = personDescription; // TODO: Update after the npcs are decided upon.
+        this.gift = gift;
     }
 }
