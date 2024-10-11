@@ -4,8 +4,10 @@ import com.palmstam.roguelite.model.RollDice;
 import com.palmstam.roguelite.model.data.ApiResponse;
 import com.palmstam.roguelite.model.data.GenerateRoomDTO;
 import com.palmstam.roguelite.model.data.ItemDTO;
+import com.palmstam.roguelite.model.databaseItems.Enemy;
 import com.palmstam.roguelite.model.databaseItems.Item;
 import com.palmstam.roguelite.model.room.Room;
+import com.palmstam.roguelite.model.room.UnavailableRoom;
 import com.palmstam.roguelite.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -114,6 +116,10 @@ public class AdventureController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @PostMapping ResponseEntity<ApiResponse<?>> addEnemyToDatabase(@RequestBody List<Enemy> enemies) {
+        return null;
+    }
+
     @GetMapping("items")
     public ResponseEntity<ApiResponse<List<Item>>> getAllItems() {
         List<Item> items = this.itemRepository.findAll();
@@ -127,7 +133,7 @@ public class AdventureController {
         Room room = generator.generateRoom(grdto.getEncounterType(), grdto.getLevel(), grdto.getNumberOfPlayers());
 
         ApiResponse<?> response;
-        if (room == null) {
+        if (room instanceof UnavailableRoom) {
             response = new ApiResponse<>("error", "Could not generate room of desired type.");
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         } else {
@@ -138,7 +144,7 @@ public class AdventureController {
 
     @GetMapping("test")
     public ResponseEntity<ApiResponse<?>> test() {
-        ApiResponse<Room> response = new ApiResponse<>("success", generator.generateRoom("Shop Room", 2, 4));
+        ApiResponse<Room> response = new ApiResponse<>("success", generator.generateRoom("Social Room", 2, 4));
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

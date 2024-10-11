@@ -48,7 +48,7 @@ public class Generator {
         this.socialNPCRepository = socialNPCRepository;
     }
 
-    public Room generateRoom(String encounterType, int level, int playerLevel) {
+    public Room generateRoom(String encounterType, int level, int numberOfPlayers) {
         switch (encounterType) {
             case "Deal Room":
                 return generateDealRoom(level);
@@ -59,11 +59,13 @@ public class Generator {
             case "Rest Room":
                 return generateRestRoom(level);
             case "Shop Room":
-                return generateShopRoom(level, playerLevel);
+                return generateShopRoom(level, numberOfPlayers);
             case "Social Room":
                 return generateSocialRoom(level);
+            case "Treasure Room":
+                return generateTreasureRoom(level, numberOfPlayers);
             default:
-                return null;
+                return new UnavailableRoom();
         }
     }
 
@@ -148,13 +150,13 @@ public class Generator {
         if (level <= 3) {
             highestRarityPosition = 4;
             numberOfWeaponsAndArmors = 1;
-        } else if (level <= 5) {
+        } else if (level <= 7) {
             highestRarityPosition = 3;
             numberOfWeaponsAndArmors = 2;
-        } else if (level <= 9) {
+        } else if (level <= 11) {
             highestRarityPosition = 2;
             numberOfWeaponsAndArmors = 4;
-        } else if (level <= 13) {
+        } else if (level <= 15) {
             highestRarityPosition = 1;
             numberOfWeaponsAndArmors = 6;
         }
@@ -230,15 +232,29 @@ public class Generator {
 
     private TreasureRoom generateTreasureRoom(int level, int numberOfPlayers) {
         String[] currencies = new String[5];
-        currencies[0] = (rollCurrencyRewardPerPerson(level, true, true) * numberOfPlayers) + " gold";
+        currencies[0] = (int)((rollCurrencyRewardPerPerson(level, true, true) * 1.5) * numberOfPlayers) + " gold";
         currencies[1] = (rollCurrencyRewardPerPerson(level, false, false) * numberOfPlayers) + " electrum";
         currencies[2] = (rollCurrencyRewardPerPerson(level, false, false) * numberOfPlayers) + " gemstones";
         currencies[3] = (rollCurrencyRewardPerPerson(level, false, false) * numberOfPlayers) + " faith";
         currencies[4] = (rollCurrencyRewardPerPerson(level, false, false) * numberOfPlayers) + " artwork";
 
+        List<String> rarities = List.of("artifact", "legendary", "very rare", "rare", "uncommon", "common", "none");
+        int highestRarityPosition = 0;
+        if (level <= 3) {
+            highestRarityPosition = 4;
+        } else if (level <= 5) {
+            highestRarityPosition = 3;
+        } else if (level <= 9) {
+            highestRarityPosition = 2;
+        } else if (level <= 13) {
+            highestRarityPosition = 1;
+        }
+        List<Item> magicItems = itemRepository.findByRarity(rarities.get(highestRarityPosition));
+        List<Item> mundaneItems = itemRepository.findByIsMundaneAndTypeIn(true, List.of("light armor", "medium armor", "heavy armor", "weapon"));
         List<Item> items = new ArrayList<>();
         for (int i = 0; i < numberOfPlayers + 1; i++) {
-            // TODO: Add items of appropriate rarities, from shop room
+            items.add(chooseRandom(magicItems));
+            items.add(chooseRandom(mundaneItems));
         }
 
         return TreasureRoom.builder()
@@ -248,6 +264,12 @@ public class Generator {
                 .currencies(currencies)
                 .items(items)
                 .build();
+    }
+
+    private CombatRoom generateCombatRoom(int level, int numberOfPlayers) {
+
+
+        return null;
     }
 
     private <T> T chooseRandom(List<T> itemList) {
