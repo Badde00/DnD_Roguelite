@@ -1,13 +1,14 @@
 package com.palmstam.roguelite.model.databaseItems;
 
-import com.opencsv.bean.AbstractBeanField;
-import com.opencsv.bean.CsvBindByName;
-import com.opencsv.bean.CsvCustomBindByName;
 import com.palmstam.roguelite.model.data.EnemyCsvParserService;
+import com.palmstam.roguelite.model.data.EnemyDTO;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Entity
 @Table(name = "enemies")
@@ -15,218 +16,307 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 @Setter
+@Builder
 public class Enemy {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @Column(unique = true)
-    @CsvBindByName(column = "Name")
     private String name;
 
-    @CsvBindByName(column = "Source")
     private String source;
 
-    @CsvBindByName(column = "Page")
     private int page;
 
-    @CsvBindByName(column = "Size")
     private String size;
 
-    @CsvBindByName(column = "Type")
-    private String type;
-//    @Embedded
-//    private Type type;
+    @Embedded
+    private Type type;
 
-    @CsvBindByName(column = "Alignment")
     private String alignment;
 
-    @CsvBindByName(column = "AC")
-    private String ac;
-//    @Embedded
-//    private Ac ac;
+    @Embedded
+    private Ac ac;
 
-    @CsvBindByName(column = "HP")
-    private String hp;
-//    @Embedded
-//    private Hp hp;
+    @Embedded
+    private Hp hp;
 
-    @CsvBindByName(column = "Speed")
-    private String speed;
-//    @Embedded
-//    private Speed speed;
+    @Embedded
+    private Speed speed;
 
-    @CsvBindByName(column = "Strength")
     private int strength;
 
-    @CsvBindByName(column = "Dexterity")
     private int dexterity;
 
-    @CsvBindByName(column = "Constitution")
     private int constitution;
 
-    @CsvBindByName(column = "Intelligence")
     private int intelligence;
 
-    @CsvBindByName(column = "Wisdom")
     private int wisdom;
 
-    @CsvBindByName(column = "Charisma")
     private int charisma;
 
-    @CsvBindByName(column = "Saving Throws")
     private String savingThrows;
 
-    @CsvBindByName(column = "Skills")
     private String skills;
 
-    @CsvBindByName(column = "Damage Vulnerabilities")
     private String damageVulnerabilities;
 
-    @CsvBindByName(column = "Damage Resistances")
     private String damageResistances;
 
-    @CsvBindByName(column = "Damage Immunities")
     private String damageImmunities;
 
-    @CsvBindByName(column = "Condition Immunities")
     private String conditionImmunities;
 
-    @CsvBindByName(column = "Senses")
     private String senses;
 
-    @CsvBindByName(column = "Languages")
     private String languages;
 
-    @CsvBindByName(column = "CR")
     private String cr;
 
-    @CsvBindByName(column = "Traits")
     private String traits;
 
-    @CsvBindByName(column = "Actions")
     private String actions;
 
-    @CsvBindByName(column = "Bonus Actions")
     private String bonusActions;
 
-    @CsvBindByName(column = "Reactions")
     private String reactions;
 
-    @CsvBindByName(column = "Legendary Actions")
     private String legendaryActions;
 
-    @CsvBindByName(column = "Mythic Actions")
     private String mythicActions;
 
-    @CsvBindByName(column = "Lair Actions")
     private String lairActions;
 
-    @CsvBindByName(column = "Regional Effects")
     private String regionalEffects;
 
-    @CsvBindByName(column = "Environment")
     private String environment;
 
 
-//    @Getter
-//    @Embeddable
-//    @NoArgsConstructor
-//    public class Type {
-//        // Input will be things like "Humanoid (Dwarf)", "Fiend (Demon)" or "Beast"
-//        private String primaryType; // Something like "Humanoid" or "Fiend"
-//        private String subType; // Something like "Dwarf" or "Demon"
-//
-//        public Type(String typeString) {
-//            setType(typeString);
-//        }
-//
-//        public String toString() {
-//            if (subType.isBlank()) {
-//                return primaryType;
-//            } else {
-//                return String.format("%s (%s)", primaryType, subType);
-//            }
-//        }
-//
-//        public void setType(String typeString) {
-//            if (typeString.contains("(")) {
-//                String[] parts = typeString.split("\\(");
-//                this.primaryType = parts[0].trim();
-//                this.subType = parts[1].replace(")", "");
-//            } else {
-//                this.primaryType = typeString.trim();
-//                this.subType = "";
-//            }
-//        }
-//    }
-//
-//
-//    @Getter
-//    @AllArgsConstructor
-//    @Embeddable
-//    public class Ac {
-//        private int acNum;
-//
-//        @Column(name = "ac_source")
-//        private String source;
-//
-//        public Ac(int acNum) {
-//            this.acNum = acNum;
-//            this.source = "";
-//        }
-//
-//        public String toString() {
-//            if (source.isBlank()) {
-//                return String.valueOf(acNum);
-//            } else {
-//                return String.format("%d (%s)", acNum, source);
-//            }
-//        }
-//    }
-//
-//    @Getter
-//    @AllArgsConstructor
-//    @Embeddable
-//    public class Hp {
-//        private int hpNum;
-//        private String calculation;
-//
-//        public Hp(int hpNum) {
-//            this.hpNum = hpNum;
-//            this.calculation = "";
-//        }
-//
-//        public String toString() {
-//            return String.format("%d (%s)", hpNum, calculation);
-//        }
-//    }
-//
-//    @Getter
-//    @ToString
-//    @Builder
-//    @Embeddable
-//    public static class Speed {
-//        private Integer walk;
-//        private Integer burrow;
-//        private Integer climb;
-//        private Integer fly;
-//        private Integer hover;
-//        private Integer swim;
-//    }
+    @Getter
+    @Embeddable
+    @NoArgsConstructor
+    public class Type {
+        // Input will be things like "Humanoid (Dwarf)", "Fiend (Demon)" or "Beast"
+        private String primaryType; // Something like "Humanoid" or "Fiend"
+        private String subType; // Something like "Dwarf" or "Demon"
 
-
-    public static void main(String[] args) {
-        String testDataPath = "C:/Users/IFlyts/Downloads/mini_bestiary.csv";
-        List<Enemy> enemies;
-        EnemyCsvParserService parser = new EnemyCsvParserService();
-        try {
-            enemies = parser.parseCsv(testDataPath);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        public Type(String typeString) {
+            setType(typeString);
         }
-        for (Enemy e : enemies) {
-            System.out.println(e.name + ": " + e.type + " - " + e.ac);
+
+        public String toString() {
+            if (subType.isBlank()) {
+                return primaryType;
+            } else {
+                return String.format("%s (%s)", primaryType, subType);
+            }
+        }
+
+        public void setType(String typeString) {
+            if (typeString.contains("(")) {
+                String[] parts = typeString.split("\\(");
+                this.primaryType = parts[0].trim();
+                this.subType = parts[1].replace(")", "");
+            } else {
+                this.primaryType = typeString.trim();
+                this.subType = "";
+            }
         }
     }
+
+
+    @Getter
+    @AllArgsConstructor
+    @Embeddable
+    public class Ac {
+        // Input will be things like "18 (natural armor)" or "18 (natural armor)"
+        private int ac;
+        private String source;
+
+        public Ac(String acString) {
+            setAc(acString);
+        }
+
+        public String toString() {
+            if (source.isBlank()) {
+                return String.valueOf(ac);
+            } else {
+                return String.format("%d (%s)", ac, source);
+            }
+        }
+
+        public void setAc(String acString) {
+            if (acString.contains("(")) {
+                String[] parts = acString.split("\\(");
+                this.ac = Integer.parseInt(parts[0].trim());
+                this.source = parts[1].replace(")", "");
+            } else {
+                this.ac = Integer.parseInt(acString.trim());
+                this.source = "";
+            }
+        }
+    }
+
+    @Getter
+    @AllArgsConstructor
+    @Embeddable
+    public class Hp {
+        private int hp;
+        private String calculation;
+
+        public Hp(String hpString) {
+            setHp(hpString);
+        }
+
+        public String toString() {
+            return String.format("%d (%s)", hp, calculation);
+        }
+
+        public void setHp(String hpString) {
+            if (hpString.contains("(")) {
+                String[] parts = hpString.split("\\(");
+                this.hp = Integer.parseInt(parts[0].trim());
+                this.calculation = parts[1].replace(")", "");
+            } else {
+                this.hp = Integer.parseInt(hpString.trim());
+            }
+        }
+    }
+
+    @Getter
+    @Embeddable
+    public static class Speed {
+        private Integer walk = 0;
+        private Integer burrow = 0;
+        private Integer climb = 0;
+        private Integer fly = 0;
+        private Integer hover = 0;
+        private Integer swim = 0;
+
+        @Override
+        public String toString() {
+            StringBuilder sb = new StringBuilder();
+
+            sb.append(walk).append(" ft.");
+            if (climb != 0) appendWithComma(sb, "Climb: " + climb + " ft.");
+            if (burrow != 0) appendWithComma(sb, "Burrow: " + burrow + " ft.");
+            if (hover != 0) {
+                appendWithComma(sb, "Fly: " + hover + " ft. (hover)");
+            } else if (fly != 0) {
+                appendWithComma(sb, "Fly: " + fly + " ft.");
+            }
+            if (hover != 0) appendWithComma(sb, "Hover: " + hover + " ft.");
+            if (swim != 0) appendWithComma(sb, "Swim: " + swim + " ft.");
+
+            return sb.toString();
+        }
+
+        public Speed(String speedString) {
+            if (speedString == null || speedString.isBlank()) {
+                return;
+            }
+
+            String[] parts = speedString.split(",");
+
+            for (String part : parts) {
+                part = part.trim();
+
+                if (part.contains("climb")) {
+                    this.climb = parseSpeed(part);
+                } else if (part.contains("burrow")) {
+                    this.burrow = parseSpeed(part);
+                } else if (part.contains("swim")) {
+                    this.swim = parseSpeed(part);
+                } else if (part.contains("fly")) {
+                    if (part.contains("hover")) {
+                        this.hover = parseSpeed(part);
+                        this.fly = 0; // Hover overwrites fly
+                    } else {
+                        this.fly = parseSpeed(part);
+                    }
+                } else if (part.contains("hover")) {
+                    this.hover = parseSpeed(part);
+                } else {
+                    // If no specific type, assume it's walking
+                    this.walk = parseSpeed(part);
+                }
+            }
+        }
+
+        private Integer parseSpeed(String speed) {
+            Matcher matcher = Pattern.compile("(\\d+)\\s*ft\\.").matcher(speed);
+            if (matcher.find()) {
+                return Integer.parseInt(matcher.group(1));
+            }
+            return 0;
+        }
+
+        private void appendWithComma(StringBuilder sb, String value) {
+            if (!sb.isEmpty()) {
+                sb.append(", ");
+            }
+            sb.append(value);
+        }
+    }
+
+    public Enemy(EnemyDTO edto) {
+        Type type = new Type(edto.getType());
+        Ac ac = new Ac(edto.getAc());
+        Hp hp = new Hp(edto.getHp());
+        Speed speed = new Speed(edto.getSpeed());
+        this.name = edto.getName();
+        this.source = edto.getSource();
+        this.page = edto.getPage();
+        this.size = edto.getSize();
+        this.type = type;
+        this.alignment = edto.getAlignment();
+        this.ac = ac;
+        this.hp = hp;
+        this.speed = speed;
+        this.strength = edto.getStrength();
+        this.dexterity = edto.getDexterity();
+        this.constitution = edto.getConstitution();
+        this.intelligence = edto.getIntelligence();
+        this.wisdom = edto.getWisdom();
+        this.charisma = edto.getCharisma();
+        this.savingThrows = edto.getSavingThrows();
+        this.skills = edto.getSkills();
+        this.damageVulnerabilities = edto.getDamageVulnerabilities();
+        this.damageResistances = edto.getDamageResistances();
+        this.damageImmunities = edto.getDamageImmunities();
+        this.conditionImmunities = edto.getConditionImmunities();
+        this.senses = edto.getSenses();
+        this.languages = edto.getLanguages();
+        this.cr = edto.getCr();
+        this.traits = edto.getTraits();
+        this.actions = edto.getActions();
+        this.bonusActions = edto.getBonusActions();
+        this.reactions = edto.getReactions();
+        this.legendaryActions = edto.getLegendaryActions();
+        this.mythicActions = edto.getMythicActions();
+        this.lairActions = edto.getLairActions();
+        this.regionalEffects = edto.getRegionalEffects();
+        this.environment = edto.getEnvironment();
+    }
+
+
+//    public static void main(String[] args) {
+//        String testDataPath = "C:/Users/IFlyts/Downloads/Bestiary.csv";
+//        List<EnemyDTO> dtoEnemies;
+//        List<Enemy> enemies = new ArrayList<>();
+//        EnemyCsvParserService parser = new EnemyCsvParserService();
+//        try {
+//            dtoEnemies = parser.parseCsv(testDataPath);
+//        } catch (Exception e) {
+//            throw new RuntimeException(e);
+//        }
+//        for (EnemyDTO edto : dtoEnemies) {
+//            enemies.add(new Enemy(edto));
+//        }
+//        for (Enemy e : enemies) {
+//            System.out.println(e.name + " - " + e.speed + " - " + e.type + " - " + e.type.primaryType);
+//        }
+//    }
 }

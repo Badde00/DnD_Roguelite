@@ -11,10 +11,10 @@ import java.util.List;
 @Service
 public class EnemyCsvParserService {
 
-    public List<Enemy> parseCsv(String filePath) throws Exception {
+    public List<EnemyDTO> parseCsv(String filePath) throws Exception {
         try (Reader reader = new FileReader(filePath)) {
-            CsvToBean<Enemy> csvToBean = new CsvToBeanBuilder<Enemy>(reader)
-                    .withType(Enemy.class)
+            CsvToBean<EnemyDTO> csvToBean = new CsvToBeanBuilder<EnemyDTO>(reader)
+                    .withType(EnemyDTO.class)
                     .withIgnoreLeadingWhiteSpace(true)
                     .build();
             return csvToBean.parse();
