@@ -185,8 +185,8 @@ public class Generator {
         }
 
         // Find all mundane weapons and armors
-        List<Item> mundaneWeapons = itemRepository.findByIsMundaneAndType(true, "weapon");
-        List<Item> mundaneArmors = itemRepository.findByIsMundaneAndTypeIn(true, List.of("light armor", "medium armor", "heavy armor"));
+        List<Item> mundaneWeapons = itemRepository.findByIsMundaneAndTypesInOrderByIsMundane(true, List.of("weapon"));
+        List<Item> mundaneArmors = itemRepository.findByIsMundaneAndTypesInOrderByIsMundane(true, List.of("light armor", "medium armor", "heavy armor"));
 
         // Add mundane weapons and armors based on numberOfWeaponsAndArmors
         for (int i = 0; i < numberOfWeaponsAndArmors; i++) {
@@ -250,7 +250,7 @@ public class Generator {
             highestRarityPosition = 1;
         }
         List<Item> magicItems = itemRepository.findByRarity(rarities.get(highestRarityPosition));
-        List<Item> mundaneItems = itemRepository.findByIsMundaneAndTypeIn(true, List.of("light armor", "medium armor", "heavy armor", "weapon"));
+        List<Item> mundaneItems = itemRepository.findByIsMundaneAndTypesInOrderByIsMundane(true, List.of("light armor", "medium armor", "heavy armor", "weapon"));
         List<Item> items = new ArrayList<>();
         for (int i = 0; i < numberOfPlayers + 1; i++) {
             items.add(chooseRandom(magicItems));

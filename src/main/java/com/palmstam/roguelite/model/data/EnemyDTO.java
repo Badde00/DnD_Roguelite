@@ -1,7 +1,9 @@
 package com.palmstam.roguelite.model.data;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.opencsv.bean.AbstractBeanField;
 import com.opencsv.bean.CsvBindByName;
+import com.opencsv.bean.CsvCustomBindByName;
 import com.palmstam.roguelite.model.databaseItems.Enemy;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,7 +19,7 @@ public class EnemyDTO {
     @CsvBindByName(column = "Source")
     private String source;
 
-    @CsvBindByName(column = "Page")
+    @CsvCustomBindByName(column = "Page", converter = PageConverter.class)
     private int page;
 
     @CsvBindByName(column = "Size")
@@ -109,6 +111,22 @@ public class EnemyDTO {
 
     @CsvBindByName(column = "Environment")
     private String environment;
+
+    public static class PageConverter extends AbstractBeanField<Integer, String> {
+        @Override
+        protected Integer convert(String value) {
+            if ("undefined".equalsIgnoreCase(value)) {
+                return -1;
+            }
+
+            try {
+                return Integer.parseInt(value.trim());
+            } catch (NumberFormatException e) {
+                return -1;
+            }
+        }
+    }
+
 
 //    public static void main(String[] args) {
 //        String testDataPath = "C:/Users/IFlyts/Downloads/Bestiary.csv";

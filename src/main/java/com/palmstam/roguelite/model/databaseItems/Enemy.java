@@ -57,47 +57,65 @@ public class Enemy {
 
     private int charisma;
 
+    @Column(length = 512)
     private String savingThrows;
 
+    @Column(length = 512)
     private String skills;
 
+    @Column(length = 512)
     private String damageVulnerabilities;
 
+    @Column(length = 512)
     private String damageResistances;
 
+    @Column(length = 512)
     private String damageImmunities;
 
+    @Column(length = 512)
     private String conditionImmunities;
 
+    @Column(length = 512)
     private String senses;
 
+    @Column(length = 512)
     private String languages;
 
-    private String cr;
+    @Embedded
+    private Cr cr;
 
+    @Column(length = 8000)
     private String traits;
 
+    @Column(length = 8001)
     private String actions;
 
+    @Column(length = 2000)
     private String bonusActions;
 
+    @Column(length = 2001)
     private String reactions;
 
+    @Column(length = 2002)
     private String legendaryActions;
 
+    @Column(length = 2003)
     private String mythicActions;
 
+    @Column(length = 4000)
     private String lairActions;
 
+    @Column(length = 4001)
     private String regionalEffects;
 
+    @Column(length = 512)
     private String environment;
 
 
     @Getter
     @Embeddable
     @NoArgsConstructor
-    public class Type {
+    public static class Type {
         // Input will be things like "Humanoid (Dwarf)", "Fiend (Demon)" or "Beast"
         private String primaryType; // Something like "Humanoid" or "Fiend"
         private String subType; // Something like "Dwarf" or "Demon"
@@ -129,40 +147,57 @@ public class Enemy {
 
     @Getter
     @AllArgsConstructor
+    @NoArgsConstructor
     @Embeddable
-    public class Ac {
+    public static class Ac {
         // Input will be things like "18 (natural armor)" or "18 (natural armor)"
         private int ac;
-        private String source;
+        private String acSource;
+        private String customCaseAC = "";
 
         public Ac(String acString) {
             setAc(acString);
         }
 
         public String toString() {
-            if (source.isBlank()) {
+            if (acSource.isBlank()) {
                 return String.valueOf(ac);
             } else {
-                return String.format("%d (%s)", ac, source);
+                return String.format("%d (%s)", ac, acSource);
             }
         }
 
         public void setAc(String acString) {
             if (acString.contains("(")) {
                 String[] parts = acString.split("\\(");
-                this.ac = Integer.parseInt(parts[0].trim());
-                this.source = parts[1].replace(")", "");
+                try {
+                    this.ac = Integer.parseInt(parts[0].trim());
+                    this.acSource = parts[1].replace(")", "");
+                    this.customCaseAC = "";
+                } catch (NumberFormatException e) {
+                    this.ac = -1;
+                    this.acSource = "";
+                    this.customCaseAC = acString;
+                }
             } else {
-                this.ac = Integer.parseInt(acString.trim());
-                this.source = "";
+                try {
+                    this.ac = Integer.parseInt(acString.trim());
+                    this.acSource = "";
+                    this.customCaseAC = "";
+                } catch (NumberFormatException e) {
+                    this.ac = -1;
+                    this.acSource = "";
+                    this.customCaseAC = acString;
+                }
             }
         }
     }
 
     @Getter
     @AllArgsConstructor
+    @NoArgsConstructor
     @Embeddable
-    public class Hp {
+    public static class Hp {
         private int hp;
         private String calculation;
 
@@ -187,6 +222,7 @@ public class Enemy {
 
     @Getter
     @Embeddable
+    @NoArgsConstructor
     public static class Speed {
         private Integer walk = 0;
         private Integer burrow = 0;
@@ -261,11 +297,72 @@ public class Enemy {
         }
     }
 
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Embeddable
+    public static class Cr {
+        // Input will be things like "13 (10 000 XP)" or "1/4 (50 XP)"
+        private String crRating;
+        private String xp;
+
+        public Cr (String crString) {
+            setCr(crString);
+        }
+
+        public String toString() {
+            if (xp.isBlank()) {
+                return crRating;
+            } else {
+                return String.format("%s (%s)", crRating, xp);
+            }
+        }
+
+        public void setCr(String crString) {
+            if (crString.contains("(")) {
+                String[] parts = crString.split("\\(");
+                this.crRating = parts[0].trim();
+                this.xp = parts[1].replace(")", "");
+            } else {
+                this.crRating = crString.trim();
+                this.xp = "";
+            }
+        }
+    }
+    //{
+    //        // Input will be things like "Humanoid (Dwarf)", "Fiend (Demon)" or "Beast"
+    //        private String primaryType; // Something like "Humanoid" or "Fiend"
+    //        private String subType; // Something like "Dwarf" or "Demon"
+    //
+    //        public Type(String typeString) {
+    //            setType(typeString);
+    //        }
+    //
+    //        public String toString() {
+    //            if (subType.isBlank()) {
+    //                return primaryType;
+    //            } else {
+    //                return String.format("%s (%s)", primaryType, subType);
+    //            }
+    //        }
+    //
+    //        public void setType(String typeString) {
+    //            if (typeString.contains("(")) {
+    //                String[] parts = typeString.split("\\(");
+    //                this.primaryType = parts[0].trim();
+    //                this.subType = parts[1].replace(")", "");
+    //            } else {
+    //                this.primaryType = typeString.trim();
+    //                this.subType = "";
+    //            }
+    //        }
+
     public Enemy(EnemyDTO edto) {
         Type type = new Type(edto.getType());
         Ac ac = new Ac(edto.getAc());
         Hp hp = new Hp(edto.getHp());
         Speed speed = new Speed(edto.getSpeed());
+        Cr cr = new Cr(edto.getCr());
         this.name = edto.getName();
         this.source = edto.getSource();
         this.page = edto.getPage();
@@ -289,7 +386,7 @@ public class Enemy {
         this.conditionImmunities = edto.getConditionImmunities();
         this.senses = edto.getSenses();
         this.languages = edto.getLanguages();
-        this.cr = edto.getCr();
+        this.cr = cr;
         this.traits = edto.getTraits();
         this.actions = edto.getActions();
         this.bonusActions = edto.getBonusActions();

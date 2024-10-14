@@ -2,8 +2,11 @@ package com.palmstam.roguelite.model.databaseItems;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.palmstam.roguelite.model.RollDice;
+import com.palmstam.roguelite.model.data.ItemDTO;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.List;
 
 @Entity
 @Table(name = "items")
@@ -19,7 +22,7 @@ public class Item {
     @Column(unique = true, length = 1000)
     private String name;
 
-    @Column(length = 2000)
+    @Column(length = 8000)
     private String description;
 
     private int price;
@@ -27,7 +30,7 @@ public class Item {
     private boolean isMundane;
     private String source;
     private int page;
-    private String type;
+    private List<String> types;
 
 
     @JsonIgnore
@@ -43,7 +46,7 @@ public class Item {
             case "artifact" -> dice.rollDiceSum(10) * 50_000;
             default -> -2;
         };
-        if (item.type.equals("potion") || item.type.equals("scroll")) {
+        if (item.types.contains("potion") || item.types.contains("scroll")) {
             price /= 2;
         }
         return price;
@@ -55,5 +58,23 @@ public class Item {
             return type.split(" \\(<a")[0];
         }
         return type;
+    }
+
+    public Item (ItemDTO itemDTO) {
+        this.name = itemDTO.getName();
+        this.description = itemDTO.getEntries() != null ? (String) itemDTO.getEntries().getFirst() : "";
+        this.rarity = itemDTO.getRarity();
+        this.types = itemDTO.getTypes();
+        this.isMundane = itemDTO.isMundane();
+        this.source = itemDTO.getSource();
+        this.page = itemDTO.getPage();
+
+        if (itemDTO.getPrice() != 0) {
+            this.price = itemDTO.getPrice() / 100;
+        } else if (itemDTO.isMundane()) {
+            this.setPrice(-1);
+        } else {
+            this.price = getPrice(this);
+        }
     }
 }

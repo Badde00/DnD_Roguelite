@@ -2,6 +2,7 @@ package com.palmstam.roguelite.model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 public class RollDice {
@@ -24,5 +25,24 @@ public class RollDice {
 
     public int rollDiceSum(int sides) {
         return rollDiceSum(1, sides);
+    }
+
+    public <T> T rollD100Table(List<T> items, List<Integer> probabilities) throws Exception {
+        if (items.size() != probabilities.size()) {
+            throw new Exception("Invalid list sizes. items and probabilities must have an equal size.");
+        }
+        if (probabilities.stream().mapToInt(Integer::intValue).sum() != 100) {
+            throw new Exception("Invalid probability list. Internal values must add up to 100.");
+        }
+        Random random = new Random();
+        int roll = random.nextInt(100);
+        for (int i = 0; i < probabilities.size(); i++) {
+            if (roll > probabilities.get(i)) {
+                roll -= probabilities.get(i);
+            } else {
+                return items.get(i);
+            }
+        }
+        throw new Exception("An unknown error occurred in rollD100Table");
     }
 }

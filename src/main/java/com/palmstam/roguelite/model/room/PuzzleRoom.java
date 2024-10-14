@@ -1,6 +1,5 @@
 package com.palmstam.roguelite.model.room;
 
-import com.palmstam.roguelite.model.RollCurrency;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;

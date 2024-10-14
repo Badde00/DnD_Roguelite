@@ -1,9 +1,7 @@
 package com.palmstam.roguelite.controller;
 
 import com.palmstam.roguelite.model.RollDice;
-import com.palmstam.roguelite.model.data.ApiResponse;
-import com.palmstam.roguelite.model.data.GenerateRoomDTO;
-import com.palmstam.roguelite.model.data.ItemDTO;
+import com.palmstam.roguelite.model.data.*;
 import com.palmstam.roguelite.model.databaseItems.Enemy;
 import com.palmstam.roguelite.model.databaseItems.Item;
 import com.palmstam.roguelite.model.room.Room;
@@ -13,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -75,30 +74,7 @@ public class AdventureController {
 
                 itemNames.add(dto.getName());
 
-                Item item = new Item();
-                item.setName(dto.getName());
-
-                if (dto.getEntries() != null && !dto.getEntries().isEmpty()) {
-                    item.setDescription(dto.getEntries().getFirst().toString());
-                }
-
-                item.setRarity(dto.getRarity());
-                item.setType(Item.cleanType(dto.getType()));
-
-                if (dto.getPrice() != 0) {
-                    item.setPrice(dto.getPrice() / 100);
-                } else if (dto.isMundane()) {
-                    item.setPrice(-1);
-                } else {
-                    int price = Item.getPrice(item);
-                    item.setPrice(price);
-                }
-
-                item.setMundane(dto.isMundane());
-                item.setSource(dto.getSource());
-                item.setPage(dto.getPage());
-
-                items.add(item);
+                items.add(new Item(dto));
             }
 
             if (!items.isEmpty()) {
@@ -116,8 +92,50 @@ public class AdventureController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @PostMapping ResponseEntity<ApiResponse<?>> addEnemyToDatabase(@RequestBody List<Enemy> enemies) {
-        return null;
+    @PostMapping("addEnemies/csv")
+    ResponseEntity<ApiResponse<?>> addEnemyToDatabase(@RequestParam("file") MultipartFile file) {
+        /*
+        * Set body to form data, set the key to 'file' and the value to the actual file
+        * and the Content-Type header to multipart/form-data
+        */
+        EnemyCsvParserService ecps = new EnemyCsvParserService();
+        List<Enemy> enemies;
+        try {
+            List<EnemyDTO> enemyDTOs = ecps.parseCsv(file);
+
+            Set<String> existingEnemyNames = enemyRepository.findAll()
+                    .stream()
+                    .map(Enemy::getName)
+                    .collect(Collectors.toSet());
+            Set<String> processedNames = new HashSet<>();
+
+            enemies = enemyDTOs.stream()
+                    .map(Enemy::new)
+                    .filter(enemy -> {
+                        String name = enemy.getName();
+                        // Check if name is in the database or was processed earlier in the CSV
+                        if (existingEnemyNames.contains(name) || processedNames.contains(name)) {
+                            return false;
+                        } else {
+                            processedNames.add(name);  // Add name to processed set
+                            return true;
+                        }
+                    })
+                    .collect(Collectors.toList());
+
+            if (enemies.isEmpty()) {
+                ApiResponse<String> response = new ApiResponse<>("error", "No new enemies to add. All names already exist.");
+                return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+            }
+
+            enemyRepository.saveAll(enemies);
+            ApiResponse<List<Enemy>> response = new ApiResponse<>("success", enemies);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            ApiResponse<String> response = new ApiResponse<>("error", "Could not create the desired enemies.");
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
     }
 
     @GetMapping("items")

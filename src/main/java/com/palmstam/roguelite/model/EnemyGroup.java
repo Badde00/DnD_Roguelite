@@ -27,11 +27,9 @@ public class EnemyGroup {
     }
 
     public static List<String> extractEnemyTypes(List<Enemy> enemies) {
-//        return enemies.stream()
-//                .map(enemy -> enemy.getType().getPrimaryType())
-//                .distinct().collect(Collectors.toList());
-        //TODO: Fix after csv parser works
-        return null;
+        return enemies.stream()
+                .map(enemy -> enemy.getType().getPrimaryType())
+                .distinct().collect(Collectors.toList());
     }
 
     public static float findGroupModifier(int groupSize) {

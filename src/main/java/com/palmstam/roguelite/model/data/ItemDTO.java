@@ -13,6 +13,7 @@ public class ItemDTO {
     private String name;
 
     @JsonDeserialize(using = EntriesDeserializer.class)
+    @JsonProperty("_fullEntries")
     private List<Object> entries; // For descriptions
 
     @JsonProperty("_fValue")
@@ -25,8 +26,8 @@ public class ItemDTO {
     @JsonProperty("_fIsMundane")
     private boolean isMundane;
 
-    @JsonProperty("_typeHtml")
-    private String type;
+    @JsonProperty("_typeListText")
+    private List<String> types;
 
     // Unneeded fields in the JSON
 //    private String reqAttune;
