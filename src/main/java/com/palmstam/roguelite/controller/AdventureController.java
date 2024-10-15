@@ -162,7 +162,7 @@ public class AdventureController {
 
     @GetMapping("test")
     public ResponseEntity<ApiResponse<?>> test() {
-        ApiResponse<Room> response = new ApiResponse<>("success", generator.generateRoom("Social Room", 2, 4));
+        ApiResponse<List<String>> response = new ApiResponse<>("success", generator.generateCrGroup(4400));
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

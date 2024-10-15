@@ -1,18 +1,17 @@
 package com.palmstam.roguelite.controller;
 
+import com.palmstam.roguelite.model.Tables;
 import com.palmstam.roguelite.model.databaseItems.*;
-import com.palmstam.roguelite.model.RollDice;
 import com.palmstam.roguelite.model.room.*;
 import com.palmstam.roguelite.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
+
+import static com.palmstam.roguelite.model.Tables.*;
 
 public class Generator {
-    Random random;
-
+    private final Tables tables;
     @Autowired
     private final EnemyRepository enemyRepository;
 
@@ -39,13 +38,13 @@ public class Generator {
             ItemRepository itemRepository,
             SocialNPCRepository socialNPCRepository
     ) {
-        random = new Random();
         this.enemyRepository = enemyRepository;
         this.dealRepository = dealRepository;
         this.gamblingGamesRepository = gamblingGamesRepository;
         this.puzzleRepository = puzzleRepository;
         this.itemRepository = itemRepository;
         this.socialNPCRepository = socialNPCRepository;
+        this.tables = new Tables();
     }
 
     public Room generateRoom(String encounterType, int level, int numberOfPlayers) {
@@ -74,7 +73,7 @@ public class Generator {
 
         if (deals.isEmpty()) return null;
 
-        Deal deal = chooseRandom(deals);
+        Deal deal = tables.chooseRandom(deals);
         return DealRoom.builder()
                 .encounterType("Deal Room")
                 .description("A place to make a shady deal...")
@@ -89,7 +88,7 @@ public class Generator {
 
         if (games.isEmpty()) return null;
 
-        GamblingGame game = chooseRandom(games);
+        GamblingGame game = tables.chooseRandom(games);
 
         int minimumBet = game.getMinimumBet();
 
@@ -117,7 +116,7 @@ public class Generator {
 
         if (puzzles.isEmpty()) return null;
 
-        Puzzle puzzle = chooseRandom(puzzles);
+        Puzzle puzzle = tables.chooseRandom(puzzles);
         return PuzzleRoom.builder()
                 .encounterType("Puzzle Room")
                 .description("A place of mysteries.")
@@ -125,7 +124,7 @@ public class Generator {
                 .roomDescription(puzzle.getRoomDescription())
                 .puzzleExplanation(puzzle.getPuzzleExplanation())
                 .answer(puzzle.getAnswer())
-                .reward(rollCurrencyRewardPerPerson(level, true, false))
+                .reward(tables.rollCurrencyRewardPerPerson(level, true, false))
                 .build();
     }
 
@@ -164,9 +163,9 @@ public class Generator {
         int lowestRarityPosition = highestRarityPosition + 2;
 
         // Deal item
-        Item dealItem = chooseRandom(itemRepository.findByRarity(rarities.get(highestRarityPosition)));
+        Item dealItem = tables.chooseRandom(itemRepository.findByRarity(rarities.get(highestRarityPosition)));
         // Highest rarity item
-        Item highestRarityItem = chooseRandom(itemRepository.findByRarity(rarities.get(highestRarityPosition)));
+        Item highestRarityItem = tables.chooseRandom(itemRepository.findByRarity(rarities.get(highestRarityPosition)));
 
         // All items of lower rarities
         List<Item> lowerRarityItems = itemRepository.findByRarity(rarities.get(lowerRarityPosition));
@@ -178,10 +177,10 @@ public class Generator {
 
         // Add lower rarity items
         for (int i = 0; i < numberOfPlayers - 1; i++) {
-            wares.add(chooseRandom(lowerRarityItems));
+            wares.add(tables.chooseRandom(lowerRarityItems));
         }
         for (int i = 0; i < numberOfPlayers; i++) {
-            wares.add(chooseRandom(lowestRarityItems));
+            wares.add(tables.chooseRandom(lowestRarityItems));
         }
 
         // Find all mundane weapons and armors
@@ -190,8 +189,8 @@ public class Generator {
 
         // Add mundane weapons and armors based on numberOfWeaponsAndArmors
         for (int i = 0; i < numberOfWeaponsAndArmors; i++) {
-            wares.add(chooseRandom(mundaneWeapons));
-            wares.add(chooseRandom(mundaneArmors));
+            wares.add(tables.chooseRandom(mundaneWeapons));
+            wares.add(tables.chooseRandom(mundaneArmors));
         }
 
 
@@ -232,11 +231,11 @@ public class Generator {
 
     private TreasureRoom generateTreasureRoom(int level, int numberOfPlayers) {
         String[] currencies = new String[5];
-        currencies[0] = (int)((rollCurrencyRewardPerPerson(level, true, true) * 1.5) * numberOfPlayers) + " gold";
-        currencies[1] = (rollCurrencyRewardPerPerson(level, false, false) * numberOfPlayers) + " electrum";
-        currencies[2] = (rollCurrencyRewardPerPerson(level, false, false) * numberOfPlayers) + " gemstones";
-        currencies[3] = (rollCurrencyRewardPerPerson(level, false, false) * numberOfPlayers) + " faith";
-        currencies[4] = (rollCurrencyRewardPerPerson(level, false, false) * numberOfPlayers) + " artwork";
+        currencies[0] = (int)((tables.rollCurrencyRewardPerPerson(level, true, true) * 1.5) * numberOfPlayers) + " gold";
+        currencies[1] = (tables.rollCurrencyRewardPerPerson(level, false, false) * numberOfPlayers) + " electrum";
+        currencies[2] = (tables.rollCurrencyRewardPerPerson(level, false, false) * numberOfPlayers) + " gemstones";
+        currencies[3] = (tables.rollCurrencyRewardPerPerson(level, false, false) * numberOfPlayers) + " faith";
+        currencies[4] = (tables.rollCurrencyRewardPerPerson(level, false, false) * numberOfPlayers) + " artwork";
 
         List<String> rarities = List.of("artifact", "legendary", "very rare", "rare", "uncommon", "common", "none");
         int highestRarityPosition = 0;
@@ -253,8 +252,8 @@ public class Generator {
         List<Item> mundaneItems = itemRepository.findByIsMundaneAndTypesInOrderByIsMundane(true, List.of("light armor", "medium armor", "heavy armor", "weapon"));
         List<Item> items = new ArrayList<>();
         for (int i = 0; i < numberOfPlayers + 1; i++) {
-            items.add(chooseRandom(magicItems));
-            items.add(chooseRandom(mundaneItems));
+            items.add(tables.chooseRandom(magicItems));
+            items.add(tables.chooseRandom(mundaneItems));
         }
 
         return TreasureRoom.builder()
@@ -267,37 +266,99 @@ public class Generator {
     }
 
     private CombatRoom generateCombatRoom(int level, int numberOfPlayers) {
+        String rewardType = tables.rollCombatReward();
+        String reward = combatRoomReward(rewardType, level, numberOfPlayers);
+        String difficulty = tables.rollDifficulty(rewardType);
+        String theme = tables.rollTheme(level);
+
 
 
         return null;
     }
 
-    private <T> T chooseRandom(List<T> itemList) {
-        return itemList.get(random.nextInt(itemList.size()));
+    private String combatRoomReward(String rewardType, int level, int numberOfPlayers) {
+        String currencyType = tables.rollCurrencies();
+        StringBuilder reward = new StringBuilder();
+        if (!rewardType.equals("Currency")) {
+            reward.append(rewardType).append(" and ");
+        }
+        reward.append(numberOfPlayers * tables.rollCurrencyRewardPerPerson(level, rewardType.equals("Currency"), currencyType.equals("Gold")));
+        reward.append(" ").append(currencyType).append(".");
+
+        return reward.toString();
     }
 
-    private int rollCurrencyRewardPerPerson(int level, boolean isCurrencyRoom, boolean isGoldRoom) {
-        int rewardPerPerson = 0;
-        RollDice dice = new RollDice();
+    private List<Enemy> generateEnemies(int level, int numberOfPlayers, String theme, String difficulty) {
+        int difficultyIndex = tables.getDifficultyIndex(difficulty);
+        int maxXp = numberOfPlayers * xpThresholdsByLevelPerPerson[level][difficultyIndex];
+        List<String> crList = generateCrGroup(maxXp);
 
-        if (level >= 1 && level <= 5) {
-            rewardPerPerson = dice.rollDiceSum(10) * 5 * (int)Math.round(Math.pow(2, level - 1));
-        } else if (level >= 6 && level <= 10) {
-            int tempLevel = level % 2 == 1 ? level - 1 : level;
-            rewardPerPerson = 50 * tempLevel + 100 * dice.rollDiceSum(tempLevel);
-        } else if (level >= 11 && level <= 15) {
-            rewardPerPerson = 100 * level + 50 * dice.rollDiceSum(4, 10);
-        } else {
-            rewardPerPerson = 500 * level + 1000 * dice.rollDiceSum(20);
+        return null;
+    }
+
+    private List<String> generateCrGroup(int maxXp) {
+        if (maxXp <= (10 + 10) * 1.5f) { // If the xp is not enough for a group of 2 cr 0's
+            return List.of("0");
+        } else if (maxXp <= (10 * 6) * 2) { // If the xp is not enough for a group of 6
+            return List.of("0", "0");
+        }
+        // Calculate max cr for groups of 2 and 6
+        String maxCrFor2 = getHighestCRForXP((int)(maxXp / (findGroupModifier(2) * 2)));
+        String maxCrFor6 = getHighestCRForXP((int)(maxXp / (findGroupModifier(6) * 6)));
+
+        // Start values
+        List<String> crGroup = new ArrayList<>(List.of(maxCrFor2, maxCrFor6));
+        int currentXp = (int) ((xpByCR.get(maxCrFor2) + xpByCR.get(maxCrFor6)) * findGroupModifier(crGroup.size()));
+
+        // Create a sorted list of CRs between maxCrFor2 and maxCrFor6
+        List<String> sortedCRs = new ArrayList<>(xpByCR.entrySet().stream()
+                .filter(e -> xpByCR.get(maxCrFor6) <= e.getValue() && e.getValue() <= xpByCR.get(maxCrFor2))
+                .map(Map.Entry::getKey)
+                .sorted(Comparator.comparingInt(xpByCR::get))
+                .toList());
+
+        while (currentXp < maxXp) {
+            // Choose possible cr to add to crGroup
+            String newCr = tables.chooseRandom(sortedCRs);
+
+            // Recalculate current cr
+            int unmodifiedXp = xpByCR.get(newCr);
+            for (String cr : crGroup) {
+                unmodifiedXp += xpByCR.get(cr);
+            }
+            int newXp = (int) (unmodifiedXp * findGroupModifier(crGroup.size() + 1));
+
+            // If still (currentXp < maxXp), add, else do nothing and let break
+            if (newXp < maxXp) {
+                crGroup.add(newCr);
+                currentXp = newXp;
+            } else {
+                sortedCRs.removeLast();
+                if (sortedCRs.isEmpty()) break;
+            }
         }
 
-        if (isCurrencyRoom) {
-            rewardPerPerson *= 2;
-        }
-        if (isGoldRoom) {
-            rewardPerPerson *= 2;
+        crGroup.sort(new Comparator<String>() {
+            @Override
+            public int compare(String o1, String o2) {
+                return Float.valueOf(o1).compareTo(Float.valueOf(o2));
+            }
+        });
+
+        return crGroup;
+    }
+
+    private String getHighestCRForXP(int xp) {
+        String highestCR = null;
+
+        for (Map.Entry<String, Integer> entry : xpByCR.entrySet()) {
+            if (entry.getValue() <= xp) {
+                if (highestCR == null || xpByCR.get(highestCR) < entry.getValue()) {
+                    highestCR = entry.getKey();
+                }
+            }
         }
 
-        return rewardPerPerson;
+        return highestCR;
     }
 }
