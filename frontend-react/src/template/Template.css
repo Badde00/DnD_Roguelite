@@ -1,3 +1,17 @@
+
+/* 80s magic font */ 
+@font-face {
+  font-family: 'BreatheFire';
+  src: url('/public/fonts/BreatheFireIii.woff') format('woff'), /* Modern Browsers */
+       url('/public/fonts/BreatheFireIii.ttf')  format('truetype'), /* Safari, Android, iOS */
+
+}
+
+/* Set the global font */
+body {
+  font-family: BreatheFire, sans-serif;
+}
+
 /* Navbar Styles */
 .navbar {
   display: flex;
@@ -10,6 +24,9 @@
 
 .title {
   margin: 0;
+  padding-left: 10px;
+  color: whitesmoke;
+  text-shadow: rgba(255,255,255,0.5) 0px 3px 3px;
 }
 
 .nav-buttons {
@@ -24,6 +41,10 @@
   padding: 10px;
   cursor: pointer;
   border-radius: 5px;
+}
+
+.questionMark {
+  font-weight: bold;
 }
 
 /* Dropdown Styles */

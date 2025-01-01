@@ -1,5 +1,6 @@
 import './Template.css';
 import { useState } from 'react';
+import { Outlet, Link } from "react-router-dom";
 
 function Template() {
 
@@ -9,44 +10,55 @@ function Template() {
     setContent(newContent);
   };
 
+  const creditStyle = {
+    color: 'hotpink'
+  }
+
   return (
     <>
       {/* Navbar */}
       <nav className="navbar">
         <h1 className="title">DM-Rougelite Companion</h1>
         <div className="nav-buttons">
+
           {/* Dropdown 1 */}
           <div className="dropdown">
-            <button className="button">Menu 1</button>
+            <button className="button">Generate floor path</button>
           </div>
 
           {/* Dropdown 2 */}
           <div className="dropdown">
-            <button className="button">Menu 2</button>
+            <button className="button">See items</button>
             <div className="dropdown-content">
-              <a href="#" onClick={() => loadContent('Menu 2 - Item 1 Content')}>Item 1</a>
-              <a href="#" onClick={() => loadContent('Menu 2 - Item 2 Content')}>Item 2</a>
+              <a href="#" onClick={() => loadContent('Menu 2 - Item 1 Content')}>Items</a>
+              <a href="#" onClick={() => loadContent('Menu 2 - Item 2 Content')}>Enemies</a>
+              <a href="#" onClick={() => loadContent('Menu 3 - Item 3 Content')}>Rooms</a>
             </div>
           </div>
 
-          {/* Dropdown 3 */}
           <div className="dropdown">
-            <button className="button">Menu 3</button>
-            <div className="dropdown-content">
-              <a href="#" onClick={() => loadContent('Menu 3 - Item 1 Content')}>Item 1</a>
-              <a href="#" onClick={() => loadContent('Menu 3 - Item 2 Content')}>Item 2</a>
-            </div>
+            <button className="button">FAQ</button>
           </div>
+
+          <div className="dropdown">
+            <button className="button questionMark">?</button>
+          </div>
+
         </div>
       </nav>
 
       {/* Main Content */}
       <main className="main-content">
-        <p>{content}</p>
+
+        <Outlet />
+
       </main>
       <footer className="footer">
-        <p>Footer</p>
-        <a target="_blank" href="https://icons8.com/icon/8Iw0xC1EvrxU/spyro">dragon</a> icos by <a target="_blank" href="https://icons8.com">Icons8</a>
+        <p>A project by Palmfeldt and Badde00</p>
+
+        <a target="_blank" style={creditStyle} href="https://icons8.com/icon/8Iw0xC1EvrxU/spyro">Dragon</a> icon by <a style={creditStyle} 
+        target="_blank" href="https://icons8.com">Icons8</a>
+
       </footer>
     </>
   );
