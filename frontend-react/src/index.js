@@ -4,7 +4,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import './index.css';
 // This is the main template for all possible pages
 import Template from './template/Template';
-import Home from './home/Home';
+import Home from './pages/home/Home';
+import ItemList from './pages/itemList/itemList';
 
 /* import reportWebVitals from './reportWebVitals'; */
 
@@ -14,6 +15,8 @@ root.render(
     <Routes>
       <Route path="/" element={<Template />}>
         <Route index element={<Home />} />
+        <Route path="itemList" element={<ItemList />} />
+        
       </Route>
     </Routes>
   </BrowserRouter>
