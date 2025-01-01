@@ -18,12 +18,16 @@ function Template() {
     <>
       {/* Navbar */}
       <nav className="navbar">
-        <h1 className="title">DM-Rougelite Companion</h1>
+        <Link to="/" style={{ textDecoration: 'none' }}>
+          <h1 className="title">DM-Rougelite Companion</h1>
+        </Link>
         <div className="nav-buttons">
 
           {/* Dropdown 1 */}
           <div className="dropdown">
-            <button className="button">Generate floor path</button>
+            <Link to="/" style={{ textDecoration: 'none' }}>
+              <button className="button">Generate floor path</button>
+            </Link>
           </div>
 
           {/* Dropdown 2 */}
@@ -37,11 +41,15 @@ function Template() {
           </div>
 
           <div className="dropdown">
-            <button className="button">FAQ</button>
+            <Link to="/" style={{ textDecoration: 'none' }}>
+              <button className="button">FAQ</button>
+            </Link>
           </div>
 
           <div className="dropdown">
-            <button className="button questionMark">?</button>
+            <Link to="/" style={{ textDecoration: 'none' }}>
+              <button className="button questionMark">?</button>
+            </Link>
           </div>
 
         </div>
@@ -56,8 +64,8 @@ function Template() {
       <footer className="footer">
         <p>A project by Palmfeldt and Badde00</p>
 
-        <a target="_blank" style={creditStyle} href="https://icons8.com/icon/8Iw0xC1EvrxU/spyro">Dragon</a> icon by <a style={creditStyle} 
-        target="_blank" href="https://icons8.com">Icons8</a>
+        <a target="_blank" style={creditStyle} href="https://icons8.com/icon/8Iw0xC1EvrxU/spyro">Dragon</a> icon by <a style={creditStyle}
+          target="_blank" href="https://icons8.com">Icons8</a>
 
       </footer>
     </>
