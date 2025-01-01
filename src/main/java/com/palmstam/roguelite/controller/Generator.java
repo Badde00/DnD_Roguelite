@@ -249,7 +249,9 @@ public class Generator {
             highestRarityPosition = 1;
         }
         List<Item> magicItems = itemRepository.findByRarity(rarities.get(highestRarityPosition));
-        List<Item> mundaneItems = itemRepository.findByIsMundaneAndTypesInOrderByIsMundane(true, List.of("light armor", "medium armor", "heavy armor", "weapon"));
+        List<Item> mundaneItems = itemRepository.findByIsMundane(true);
+        List<String> desiredMundaneTypes = List.of("light armor", "medium armor", "heavy armor", "weapon");
+        mundaneItems.removeIf(item -> Collections.disjoint(item.getTypes(), desiredMundaneTypes));
         List<Item> items = new ArrayList<>();
         for (int i = 0; i < numberOfPlayers + 1; i++) {
             items.add(tables.chooseRandom(magicItems));
@@ -296,7 +298,7 @@ public class Generator {
         return null;
     }
 
-    private List<String> generateCrGroup(int maxXp) {
+    public List<String> generateCrGroup(int maxXp) {
         if (maxXp <= (10 + 10) * 1.5f) { // If the xp is not enough for a group of 2 cr 0's
             return List.of("0");
         } else if (maxXp <= (10 * 6) * 2) { // If the xp is not enough for a group of 6
