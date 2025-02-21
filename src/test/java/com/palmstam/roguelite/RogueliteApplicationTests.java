@@ -7,9 +7,4 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest
 class RogueliteApplicationTests {
 
-	@Test
-  @Disabled("Not implemented yet")
-	void contextLoads() {
-	}
-
 }
