@@ -1,0 +1,224 @@
+{
+  "status": "success",
+  "data": {
+    "slot1": {
+      "room1": {
+        "encounterType": "Deal Room",
+        "description": "A place to make a shady deal...",
+        "level": 1,
+        "hidden": false,
+        "roomDescription": "A dark, dank room stands before you, with a single lonely programmer sitting with a laptop in the middle, light illuminating only her face in an eery way",
+        "deal": "you get: Hug, I get: Mental Health"
+      },
+      "room2": {
+        "encounterType": "Gambling Room",
+        "description": "A place where the daring can soar to the heavens!",
+        "level": 1,
+        "hidden": false,
+        "roomDescription": "A room with golden walls and loud sound coming from an unknown place has a game in the middle",
+        "gameType": "Roulette",
+        "rules": "Players can bet on red (odd, except 1), black (even, except 20), or green (1, 20). Roll a d20: red/black wins 2x the bet, green wins 8x on 1 or 20.",
+        "minimumBet": 1
+      },
+      "room3": null
+    },
+    "slot2": {
+      "room1": {
+        "encounterType": "Puzzle Room",
+        "description": "A place of mysteries.",
+        "level": 1,
+        "hidden": true,
+        "roomDescription": "A dark room with only a table. On the table are 5 cups with liquids of different colors and a piece of paper with some text on it. The colors are blue, green, yellow, red and black. The text on the paper says 'Take a sip of the green'.",
+        "puzzleExplanation": "To leave the room, the characters must all drink a sip of the green liquid, but each cup only has enough liquid that one character will be left without.",
+        "answer": "For all players to pass the test, they must mix the blue and yellow liquids to make more green. Another alternative is for fewer than all characters to drink the green liquid and then have the last one killed.",
+        "reward": 25
+      },
+      "room2": {
+        "encounterType": "Rest Room",
+        "description": "A place to breathe out and regain your energies.",
+        "level": 1,
+        "hidden": false,
+        "roomDescription": "An expansive room with a covered with soft grass. There's a small stream and a fruit tree to rest under."
+      },
+      "room3": {
+        "encounterType": "Combat Room",
+        "description": "A meeting of might!",
+        "level": 1,
+        "hidden": false,
+        "enemyGroup": {
+          "enemies": [
+            {
+              "id": 271,
+              "name": "Blood Hawk",
+              "source": "MM",
+              "page": 319,
+              "size": "Small",
+              "type": {
+                "primaryType": "Beast",
+                "subType": ""
+              },
+              "alignment": "unaligned",
+              "ac": {
+                "ac": 12,
+                "acSource": "",
+                "customCaseAC": null
+              },
+              "hp": {
+                "hp": 7,
+                "calculation": "2d6"
+              },
+              "speed": {
+                "walk": 10,
+                "burrow": 0,
+                "climb": 0,
+                "fly": 60,
+                "hover": 0,
+                "swim": 0
+              },
+              "strength": 6,
+              "dexterity": 14,
+              "constitution": 10,
+              "intelligence": 3,
+              "wisdom": 14,
+              "charisma": 5,
+              "savingThrows": "",
+              "skills": "Perception +4",
+              "damageVulnerabilities": "",
+              "damageResistances": "",
+              "damageImmunities": "",
+              "conditionImmunities": "",
+              "senses": "passive Perception 14",
+              "languages": "—",
+              "cr": {
+                "crRating": "1/8",
+                "xp": "25 XP"
+              },
+              "traits": "Keen Sight. The hawk has advantage on Wisdom (Perception) checks that rely on sight. Pack Tactics. The hawk has advantage on an attack roll against a creature if at least one of the hawk's allies is within 5 feet of the creature and the ally isn't incapacitated.",
+              "actions": "Beak. Melee Weapon Attack: +4 to hit, reach 5 ft., one target. Hit: 4 (1d4 + 2) piercing damage.",
+              "bonusActions": "",
+              "reactions": "",
+              "legendaryActions": "",
+              "mythicActions": "",
+              "lairActions": "",
+              "regionalEffects": "",
+              "environment": "Arctic, Coastal, Forest, Grassland, Hill, Mountain"
+            },
+            {
+              "id": 159,
+              "name": "Ape",
+              "source": "MM",
+              "page": 317,
+              "size": "Medium",
+              "type": {
+                "primaryType": "Beast",
+                "subType": ""
+              },
+              "alignment": "unaligned",
+              "ac": {
+                "ac": 12,
+                "acSource": "",
+                "customCaseAC": null
+              },
+              "hp": {
+                "hp": 19,
+                "calculation": "3d8 + 6"
+              },
+              "speed": {
+                "walk": 30,
+                "burrow": 0,
+                "climb": 30,
+                "fly": 0,
+                "hover": 0,
+                "swim": 0
+              },
+              "strength": 16,
+              "dexterity": 14,
+              "constitution": 14,
+              "intelligence": 6,
+              "wisdom": 12,
+              "charisma": 7,
+              "savingThrows": "",
+              "skills": "Athletics +5, Perception +3",
+              "damageVulnerabilities": "",
+              "damageResistances": "",
+              "damageImmunities": "",
+              "conditionImmunities": "",
+              "senses": "passive Perception 13",
+              "languages": "—",
+              "cr": {
+                "crRating": "1/2",
+                "xp": "100 XP"
+              },
+              "traits": "",
+              "actions": "Multiattack. The ape makes two fist attacks. Fist. Melee Weapon Attack: +5 to hit, reach 5 ft., one target. Hit: 6 (1d6 + 3) bludgeoning damage. Rock. Ranged Weapon Attack: +5 to hit, range 25/50 ft., one target. Hit: 6 (1d6 + 3) bludgeoning damage.",
+              "bonusActions": "",
+              "reactions": "",
+              "legendaryActions": "",
+              "mythicActions": "",
+              "lairActions": "",
+              "regionalEffects": "",
+              "environment": "Forest"
+            }
+          ],
+          "enemyTypes": [
+            "Beast"
+          ],
+          "groupModifier": 1.5,
+          "xpAmount": 125
+        },
+        "mapURL": "https://dicegrimorium.com/wp-content/uploads/2019/10/StraightRoadPublicJPG.jpg",
+        "themes": [
+          "Beast"
+        ],
+        "reward": 50,
+        "difficulty": "Easy"
+      }
+    },
+    "slot3": {
+      "room1": {
+        "encounterType": "Shop Room",
+        "description": "A wonderful place where you can buy items in return for gold. It's not recommended to steal or attack the merchant...",
+        "level": 1,
+        "hidden": false,
+        "shopDescription": "A stony cave with a Lizardfolk merchant sitting on a chequered rug with various items spread out before them.",
+        "wares": [
+          {
+            "id": 98,
+            "name": "+1 Bloodwell Vial",
+            "description": "",
+            "price": 400,
+            "rarity": "uncommon",
+            "isMundane": false,
+            "source": "TCE",
+            "page": 122,
+            "types": ["wondrous weapon"]
+          }
+        ],
+        "itemDeal": {
+          "id": 101,
+          "name": "+1 Moon Sickle",
+          "description": "This silver-bladed sickle glimmers softly with moonlight. While holding this magic weapon, you gain a +1 bonus to attack and damage rolls made with it, and you gain a +1 bonus to spell attack rolls and the saving throw DCs of your druid and ranger spells. In addition, you can use the sickle as a spellcasting focus for your druid and ranger spells.\nWhen you cast a spell that restores hit points, you can roll a {@dice d4} and add the number rolled to the amount of hit points restored, provided you are holding the sickle.",
+          "price": 50,
+          "rarity": "uncommon",
+          "isMundane": false,
+          "source": "TCE",
+          "page": 133,
+          "types": ["simple weapon", "melee weapon"]
+        }
+      },
+      "room2": {
+        "encounterType": "Social Room",
+        "description": "A place to meet unique individuals",
+        "level": 1,
+        "hidden": false,
+        "roomDescription": "A large metal cage in an open field.",
+        "personDescription": "fuuny buuny",
+        "gift": "Buuny Kiss: Get 10 temporary HP that regenerate every time you rest and lasts until the next time you level up"
+      },
+      "room3": null
+    },
+    "boss1": {
+
+    }
+  }
+}

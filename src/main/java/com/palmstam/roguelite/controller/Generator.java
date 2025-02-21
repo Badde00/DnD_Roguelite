@@ -131,9 +131,9 @@ public class Generator {
     private RestRoom generateRestRoom(int level) {
         return RestRoom.builder()
                 .encounterType("Rest Room")
-                .description("A place to breathe out and regain your energies")
+                .description("A place to breathe out and regain your energies.")
                 .level(level)
-                .roomDescription("An expansive room with a covered with soft grass. There's a small stream and a fruit tree to rest under")
+                .roomDescription("An expansive room with a covered with soft grass. There's a small stream and a fruit tree to rest under.")
                 .build();
     }
 

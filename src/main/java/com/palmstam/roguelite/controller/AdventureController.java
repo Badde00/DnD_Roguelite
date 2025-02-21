@@ -8,6 +8,8 @@ import com.palmstam.roguelite.model.room.Room;
 import com.palmstam.roguelite.model.room.UnavailableRoom;
 import com.palmstam.roguelite.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -93,7 +95,7 @@ public class AdventureController {
     }
 
     @PostMapping("addEnemies/csv")
-    ResponseEntity<ApiResponse<?>> addEnemyToDatabase(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<ApiResponse<?>> addEnemyToDatabase(@RequestParam("file") MultipartFile file) {
         /*
         * Set body to form data, set the key to 'file' and the value to the actual file
         * and the Content-Type header to multipart/form-data
@@ -136,6 +138,13 @@ public class AdventureController {
             ApiResponse<String> response = new ApiResponse<>("error", "Could not create the desired enemies.");
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @GetMapping("roomSeries")
+    public ResponseEntity<Resource> getExampleRoomSeries() {
+        Resource resource = new ClassPathResource("../data/example-data-room-series.json");
+
+        return new ResponseEntity<>(resource, HttpStatus.OK);
     }
 
     @GetMapping("items")
